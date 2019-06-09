@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  pantheon:
+    image: "pegasyseng/pantheon:1.0.2"
+    command:
+    - "--rpc-http-enabled" 
+    - "--rpc-http-api=ETH,NET,IBFT,ADMIN,DEBUG,PERM,EEA,WEB3"
+    - "--host-whitelist=*" 
+    - "--rpc-http-cors-origins=*" 
+    - "--network-id"
+    - "123"
+    - "--min-gas-price=0"
+    ports:
+    - "8545:8545"
+    - "8546:8546"
+    - "30303:30303"
+    - "30303:30303/udp"
+    volumes:
+    - "./pantheon-data:/var/lib/pantheon"
+    - "./genesis.json:/etc/pantheon/genesis.json"
