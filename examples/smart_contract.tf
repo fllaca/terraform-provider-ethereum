@@ -9,3 +9,12 @@ resource "ethereum_smart_contract" "store" {
 
   parameters = ["v1.0"]
 }
+
+resource "ethereum_smart_contract_transact" "setItem" {
+  abi = "${ethereum_smart_contract.store.abi}"
+  to = "${ethereum_smart_contract.store.address}"
+
+	method = "setItem"
+
+  parameters = ["key", "value"]
+}

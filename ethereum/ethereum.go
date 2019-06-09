@@ -29,6 +29,11 @@ func ConvertArgumentsTypes(arguments abi.Arguments, params ...interface{}) []int
 		case "uint8":
 			v, _ := strconv.Atoi(param.(string))
 			inputs = append(inputs, uint8(v))
+		case "bytes32":
+			var arr [32]byte
+
+			copy(arr[:], []byte(param.(string))[:32])
+			inputs = append(inputs, arr)
 		// strings fall here
 		default:
 			inputs = append(inputs, param)
@@ -84,4 +89,26 @@ func DeployContract(auth *bind.TransactOpts, backend bind.ContractBackend, contr
 		return common.Address{}, contract, nil, errors.New("Error Deploying: " + err.Error())
 	}
 	return address, contract, tx, nil
+}
+
+func BindContract(address common.Address, backend bind.ContractBackend, parsed abi.ABI) (*bind.BoundContract, error) {
+	return bind.NewBoundContract(address, parsed, backend, backend, backend), nil
+}
+
+func TransactContract(auth *bind.TransactOpts, backend bind.ContractBackend, contractAbi string, contractAddress string, method string, params ...interface{}) (*types.Transaction, error) {
+	parsed, err := abi.JSON(strings.NewReader(contractAbi))
+	if err != nil {
+		return nil, errors.New("Error Parsing: " + err.Error())
+	}
+
+	to := common.HexToAddress(contractAddress)
+
+	contract, err := BindContract(to, backend, parsed)
+	if err != nil {
+		return nil, errors.New("Error Binding Contract: " + err.Error())
+	}
+
+	inputs := ConvertArgumentsTypes(parsed.Methods[method].Inputs, params...)
+
+	return contract.Transact(auth, method, inputs...)
 }

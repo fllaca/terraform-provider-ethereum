@@ -26,6 +26,7 @@ func Provider() *schema.Provider {
 		},
 		ResourcesMap: map[string]*schema.Resource{
 			"ethereum_smart_contract": resourceSmartContract(),
+			"ethereum_smart_contract_transact": resourceTransactionSend(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
